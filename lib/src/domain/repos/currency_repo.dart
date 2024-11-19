@@ -1,16 +1,40 @@
 import 'package:currency_converter/src/service/currency_service.dart';
 
 class CurrencyRepo {
-  const CurrencyRepo({required this.currencyService});
+  CurrencyRepo({required this.currencyService});
   final CurrencyService currencyService;
 
-  Future<Map<String, double>> getConversionRates() async {
+  Map<String, dynamic> _conversionRates = {};
+
+  Future<Map<String, dynamic>> getConversionRates() async {
     try {
       final res = await currencyService.fetchConversionRates();
+      _conversionRates = res.conversionRates;
       return res.conversionRates;
     } catch (e) {
       rethrow;
     }
+  }
+
+  String getConvertedValue({
+    required double input,
+    required String inputCurr,
+    required String convertToCurr,
+  }) {
+    //get dollar value
+    final inputCurrValue = convertToDouble(_conversionRates[inputCurr]);
+    final usdVal = input / inputCurrValue;
+    //convertToCurr value * dollar value
+    final convertToCurrValue = convertToDouble(_conversionRates[convertToCurr]);
+    final convertedResult = usdVal * convertToCurrValue;
+    return convertedResult.toString();
+  }
+
+  double convertToDouble(dynamic val) {
+    if (val.runtimeType == int) {
+      return (val as int).toDouble();
+    }
+    return val as double;
   }
 
   //https://www.exchangerate-api.com/docs/standard-requests

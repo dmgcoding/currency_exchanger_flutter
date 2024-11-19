@@ -23,6 +23,8 @@ class ExchangeRatesCubit extends Cubit<ExchangeRatesState> {
         ),
       );
     } catch (e) {
+      //TODO: REMOVE PRINT
+      print(e);
       final err = currencyRepo.getErrorMsgFromType(e.toString());
       emit(
         state.copyWith(
@@ -32,9 +34,28 @@ class ExchangeRatesCubit extends Cubit<ExchangeRatesState> {
     }
   }
 
+  void changeInput(double val) {
+    emit(state.copyWith(input: val));
+  }
+
+  void changeCurrency(String val) {
+    emit(state.copyWith(inputCurrency: val));
+  }
+
   void addCurrencyToConvert() {
     final currentList = state.toConvertList;
     final updatedList = [...currentList, 'USD'];
+    emit(state.copyWith(toConvertList: updatedList));
+  }
+
+  void removeFromCurrencyToConvert(int index) {
+    final currentList = state.toConvertList;
+    final updatedList = <String>[];
+    for (var i = 0; i < currentList.length; i++) {
+      if (index != i) {
+        updatedList.add(currentList[i]);
+      }
+    }
     emit(state.copyWith(toConvertList: updatedList));
   }
 }

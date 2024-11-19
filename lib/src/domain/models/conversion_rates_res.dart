@@ -8,13 +8,13 @@ class ConversionRatesRes {
   });
   String result;
   String baseCode;
-  Map<String, double> conversionRates;
+  Map<String, dynamic> conversionRates;
 
   factory ConversionRatesRes.fromJson(Map<String, dynamic> json) =>
       ConversionRatesRes(
         result: json['result'] as String,
         baseCode: json['base_code'] as String,
-        conversionRates: json['conversion_rates'] as Map<String, double>,
+        conversionRates: json['conversion_rates'] as Map<String, dynamic>,
       );
 
   Map<String, dynamic> toJson() => {

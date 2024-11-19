@@ -12,7 +12,9 @@ class CurrencyExchangePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ExchangeRatesCubit(currencyRepo: lc()),
+      create: (context) =>
+          ExchangeRatesCubit(currencyRepo: lc())..getConversionRates(),
+      lazy: false,
       child: const CurrencyExchangeView(),
     );
   }

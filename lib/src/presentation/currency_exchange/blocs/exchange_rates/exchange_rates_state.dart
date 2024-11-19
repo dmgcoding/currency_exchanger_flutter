@@ -8,30 +8,36 @@ final class ExchangeRatesState extends Equatable {
     required this.input,
     required this.toConvertList,
     required this.currencyList,
+    required this.inputCurrency,
   });
 
   factory ExchangeRatesState.init() => const ExchangeRatesState(
-      conversionRates: {},
-      msg: UIMessage(),
-      input: '',
-      toConvertList: ['USD'],
-      currencyList: ['USD']);
+        conversionRates: {},
+        msg: UIMessage(),
+        input: 0,
+        toConvertList: ['USD'],
+        currencyList: ['USD'],
+        inputCurrency: 'USD',
+      );
 
-  final Map<String, double> conversionRates;
+  final Map<String, dynamic> conversionRates;
   final UIMessage msg;
-  final String input;
+  final double input;
   final List<String> toConvertList;
   final List<String> currencyList;
+  final String inputCurrency;
 
   ExchangeRatesState copyWith({
-    Map<String, double>? conversionRates,
+    Map<String, dynamic>? conversionRates,
     UIMessage? msg,
-    String? input,
+    double? input,
+    String? inputCurrency,
     List<String>? toConvertList,
     List<String>? currencyList,
   }) =>
       ExchangeRatesState(
         conversionRates: conversionRates ?? this.conversionRates,
+        inputCurrency: inputCurrency ?? this.inputCurrency,
         msg: msg ?? this.msg,
         input: input ?? this.input,
         toConvertList: toConvertList ?? this.toConvertList,
@@ -45,5 +51,6 @@ final class ExchangeRatesState extends Equatable {
         input,
         toConvertList,
         currencyList,
+        inputCurrency,
       ];
 }

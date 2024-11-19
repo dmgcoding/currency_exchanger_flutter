@@ -1,68 +1,110 @@
 import 'package:currency_converter/core/consts/colors.dart';
+import 'package:currency_converter/locator.dart';
+import 'package:currency_converter/src/domain/repos/currency_repo.dart';
+import 'package:currency_converter/src/presentation/currency_exchange/blocs/exchange_rates/exchange_rates_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class OutuputWidget extends StatelessWidget {
+class OutuputWidget extends StatefulWidget {
   const OutuputWidget({
+    required this.index,
+    required this.cur,
     super.key,
   });
 
+  final int index;
+  final String cur;
+
+  @override
+  State<OutuputWidget> createState() => _OutuputWidgetState();
+}
+
+class _OutuputWidgetState extends State<OutuputWidget> {
+  String _selectedCurrency = 'USD';
+  @override
+  void initState() {
+    _selectedCurrency = widget.cur;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 7),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: AppColors.grey800,
-      ),
-      child: Row(
-        children: [
-          const Expanded(
-            child: Text('30000.00'),
+    return BlocBuilder<ExchangeRatesCubit, ExchangeRatesState>(
+      builder: (context, state) {
+        return Container(
+          margin: const EdgeInsets.symmetric(vertical: 7),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: AppColors.grey800,
           ),
-          Container(
-            width: 30,
-            height: 30,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: NetworkImage('https://flagcdn.com/w320/us.png'),
-                fit: BoxFit.cover,
+          child: Row(
+            children: [
+              Expanded(
+                child: Builder(
+                  builder: (context) {
+                    final text = lc<CurrencyRepo>().getConvertedValue(
+                      input: state.input,
+                      inputCurr: state.inputCurrency,
+                      convertToCurr: _selectedCurrency,
+                    );
+                    return Text(text);
+                  },
+                ),
               ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          SizedBox(
-            width: 70,
-            child: DropdownButton<String>(
-              isExpanded: true,
-              underline: const SizedBox.shrink(),
-              alignment: AlignmentDirectional.centerEnd,
-              value: 'USD', // Current selected value
-              hint: const Text(
-                  'Select an option'), // Placeholder when no value is selected
-              items: ['USD', 'GBP'].map((String item) {
-                return DropdownMenuItem<String>(
-                  alignment: AlignmentDirectional.centerEnd,
-                  value: item,
-                  child: Text(
-                    item,
-                    textAlign: TextAlign.right,
+              Container(
+                width: 30,
+                height: 30,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: NetworkImage('https://flagcdn.com/w320/us.png'),
+                    fit: BoxFit.cover,
                   ),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {},
-            ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              SizedBox(
+                width: 70,
+                child: DropdownButton<String>(
+                  menuMaxHeight: 300,
+                  isExpanded: true,
+                  underline: const SizedBox.shrink(),
+                  alignment: AlignmentDirectional.centerEnd,
+                  value: _selectedCurrency,
+                  hint: const Text(
+                    'Select an option',
+                  ),
+                  items: state.currencyList.map((String item) {
+                    return DropdownMenuItem<String>(
+                      alignment: AlignmentDirectional.centerEnd,
+                      value: item,
+                      child: Text(
+                        item,
+                        textAlign: TextAlign.right,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedCurrency = newValue ?? 'USD';
+                    });
+                  },
+                ),
+              ),
+              IconButton(
+                onPressed: () => context
+                    .read<ExchangeRatesCubit>()
+                    .removeFromCurrencyToConvert(widget.index),
+                icon: const Icon(
+                  Icons.delete,
+                  color: AppColors.red800,
+                ),
+              ),
+            ],
           ),
-          const IconButton(
-            onPressed: null,
-            icon: Icon(
-              Icons.delete,
-              color: AppColors.red800,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

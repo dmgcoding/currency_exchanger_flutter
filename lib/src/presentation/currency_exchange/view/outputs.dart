@@ -24,25 +24,37 @@ class Outputs extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: state.toConvertList
-                    .map((cur) => const OutuputWidget())
+                    .asMap()
+                    .entries
+                    .map(
+                      (entry) => OutuputWidget(
+                        index: entry.key,
+                        cur: entry.value,
+                      ),
+                    )
                     .toList(),
               );
             },
           ),
           const SizedBox(height: 25),
           Align(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                color: AppColors.green800,
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.add),
-                  Text('ADD CONVERTER'),
-                ],
+            child: GestureDetector(
+              onTap: () =>
+                  context.read<ExchangeRatesCubit>().addCurrencyToConvert(),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  color: AppColors.green800,
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add),
+                    Text('ADD CONVERTER'),
+                  ],
+                ),
               ),
             ),
           ),
