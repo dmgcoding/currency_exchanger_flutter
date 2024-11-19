@@ -1,3 +1,4 @@
+import 'package:currency_converter/src/presentation/currency_exchange/currency_exchange.dart';
 import 'package:flutter/material.dart';
 
 class SplashPage extends StatelessWidget {
@@ -14,6 +15,29 @@ class SplashView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      body: Center(
+        child: SizedBox(
+            width: MediaQuery.sizeOf(context).width * 0.6,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute<dynamic>(
+                    builder: (context) => const CurrencyExchangePage(),
+                  ),
+                );
+              },
+              child: const Text(
+                'Advanced Exchanger',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )),
+      ),
+    );
   }
 }
