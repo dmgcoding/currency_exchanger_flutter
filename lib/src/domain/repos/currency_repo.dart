@@ -1,19 +1,57 @@
+import 'package:currency_converter/src/service/country_service.dart';
 import 'package:currency_converter/src/service/currency_service.dart';
+import 'package:currency_converter/src/service/local_storage_service.dart';
 
 class CurrencyRepo {
-  CurrencyRepo({required this.currencyService});
+  CurrencyRepo({
+    required this.currencyService,
+    required this.countryService,
+    required this.localStorageService,
+  });
   final CurrencyService currencyService;
+  final CountryService countryService;
+  final LocalStorageService localStorageService;
 
   Map<String, dynamic> _conversionRates = {};
+
+  String getCountryFlagFromCurrency(String curr) {
+    final countryCode = countryService.getCountryCodeFromCurrencyCode(curr);
+    if (countryCode == null) {
+      return 'https://cdn.pixabay.com/photo/2014/05/24/00/07/woven-cloth-352481_1280.jpg';
+    }
+    return 'https://flagcdn.com/w320/$countryCode.png';
+  }
 
   Future<Map<String, dynamic>> getConversionRates() async {
     try {
       final res = await currencyService.fetchConversionRates();
       _conversionRates = res.conversionRates;
+      localStorageService.saveConversionRates(_conversionRates);
       return res.conversionRates;
     } catch (e) {
       rethrow;
     }
+  }
+
+  Map<String, dynamic> getConversionRatesFromStorage() {
+    try {
+      final rates = localStorageService.getConversionRates();
+      return rates;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  List<String> getFavoritedCurrencies() {
+    return localStorageService.getFavoritedCurrencies();
+  }
+
+  void saveFavoriteCurrency(String curr) {
+    localStorageService.saveFavoriteCurrency(curr);
+  }
+
+  void removeFavoritedCurrency(String curr) {
+    localStorageService.removeFavoriteCurrency(curr);
   }
 
   String getConvertedValue({
@@ -34,6 +72,7 @@ class CurrencyRepo {
     if (val.runtimeType == int) {
       return (val as int).toDouble();
     }
+    if (val == null) return 0;
     return val as double;
   }
 

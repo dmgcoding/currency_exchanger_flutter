@@ -16,21 +16,39 @@ class ExchangeRatesCubit extends Cubit<ExchangeRatesState> {
     try {
       final conversionRatesMap = await currencyRepo.getConversionRates();
       final currencyList = conversionRatesMap.keys.toList();
+
+      final favoritedCurrencies = currencyRepo.getFavoritedCurrencies();
+      if (favoritedCurrencies.isEmpty) {
+        favoritedCurrencies.add('USD');
+      }
       emit(
         state.copyWith(
           conversionRates: conversionRatesMap,
           currencyList: currencyList,
+          toConvertList: favoritedCurrencies,
+          msg: const UIMessage(),
         ),
       );
     } catch (e) {
-      //TODO: REMOVE PRINT
-      print(e);
-      final err = currencyRepo.getErrorMsgFromType(e.toString());
-      emit(
-        state.copyWith(
-          msg: UIMessage(errorMsg: err),
-        ),
-      );
+      //fetch from local storage in case of error
+      final conversionRatesMap = currencyRepo.getConversionRatesFromStorage();
+      if (conversionRatesMap.entries.toList().isEmpty) {
+        final err = currencyRepo.getErrorMsgFromType(e.toString());
+        emit(
+          state.copyWith(
+            msg: UIMessage(errorMsg: err),
+          ),
+        );
+      } else {
+        final currencyList = conversionRatesMap.keys.toList();
+        emit(
+          state.copyWith(
+            conversionRates: conversionRatesMap,
+            currencyList: currencyList,
+            msg: const UIMessage(),
+          ),
+        );
+      }
     }
   }
 
@@ -42,13 +60,18 @@ class ExchangeRatesCubit extends Cubit<ExchangeRatesState> {
     emit(state.copyWith(inputCurrency: val));
   }
 
+  void addCurrencyToFavorite(String curr) {
+    currencyRepo.saveFavoriteCurrency(curr);
+  }
+
   void addCurrencyToConvert() {
     final currentList = state.toConvertList;
     final updatedList = [...currentList, 'USD'];
     emit(state.copyWith(toConvertList: updatedList));
   }
 
-  void removeFromCurrencyToConvert(int index) {
+  void removeFromCurrencyToConvert(int index, String curr) {
+    currencyRepo.removeFavoritedCurrency(curr);
     final currentList = state.toConvertList;
     final updatedList = <String>[];
     for (var i = 0; i < currentList.length; i++) {

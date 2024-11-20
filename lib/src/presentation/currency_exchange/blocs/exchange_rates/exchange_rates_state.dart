@@ -15,7 +15,7 @@ final class ExchangeRatesState extends Equatable {
         conversionRates: {},
         msg: UIMessage(),
         input: 0,
-        toConvertList: ['USD'],
+        toConvertList: [],
         currencyList: ['USD'],
         inputCurrency: 'USD',
       );

@@ -23,7 +23,9 @@ class _OutuputWidgetState extends State<OutuputWidget> {
   String _selectedCurrency = 'USD';
   @override
   void initState() {
-    _selectedCurrency = widget.cur;
+    setState(() {
+      _selectedCurrency = widget.cur;
+    });
     super.initState();
   }
 
@@ -48,20 +50,26 @@ class _OutuputWidgetState extends State<OutuputWidget> {
                       inputCurr: state.inputCurrency,
                       convertToCurr: _selectedCurrency,
                     );
-                    return Text(text);
+                    return Text(text == '0.0' ? '-' : text);
                   },
                 ),
               ),
-              Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: NetworkImage('https://flagcdn.com/w320/us.png'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              Builder(
+                builder: (context) {
+                  final flag = lc<CurrencyRepo>()
+                      .getCountryFlagFromCurrency(_selectedCurrency);
+                  return Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: NetworkImage(flag),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
               ),
               const SizedBox(width: 12),
               SizedBox(
@@ -89,13 +97,19 @@ class _OutuputWidgetState extends State<OutuputWidget> {
                     setState(() {
                       _selectedCurrency = newValue ?? 'USD';
                     });
+                    context
+                        .read<ExchangeRatesCubit>()
+                        .addCurrencyToFavorite(_selectedCurrency);
                   },
                 ),
               ),
               IconButton(
                 onPressed: () => context
                     .read<ExchangeRatesCubit>()
-                    .removeFromCurrencyToConvert(widget.index),
+                    .removeFromCurrencyToConvert(
+                      widget.index,
+                      _selectedCurrency,
+                    ),
                 icon: const Icon(
                   Icons.delete,
                   color: AppColors.red800,

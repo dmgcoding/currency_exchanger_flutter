@@ -32,12 +32,38 @@ class CurrencyExchangeView extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: ListView(
-          children: [
-            const SizedBox(height: 15),
-            InsertInput(),
-            Outputs(),
-          ],
+        child: BlocBuilder<ExchangeRatesCubit, ExchangeRatesState>(
+          builder: (context, state) {
+            if (state.msg.errorMsg != null) {
+              return Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(state.msg.errorMsg ?? 'Some error occured.'),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: () => context
+                          .read<ExchangeRatesCubit>()
+                          .getConversionRates(),
+                      child: const Text('Refresh'),
+                    ),
+                  ],
+                ),
+              );
+            }
+            if (state.currencyList.isEmpty) {
+              return const Center(
+                child: Text('Fetching data...'),
+              );
+            }
+            return ListView(
+              children: const [
+                SizedBox(height: 15),
+                InsertInput(),
+                Outputs(),
+              ],
+            );
+          },
         ),
       ),
     );

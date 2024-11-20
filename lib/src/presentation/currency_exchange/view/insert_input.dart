@@ -1,4 +1,6 @@
 import 'package:currency_converter/core/consts/colors.dart';
+import 'package:currency_converter/locator.dart';
+import 'package:currency_converter/src/domain/repos/currency_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,24 +45,33 @@ class InsertInput extends StatelessWidget {
                           focusedBorder: InputBorder.none,
                           errorBorder: InputBorder.none,
                           disabledBorder: InputBorder.none,
-                          hintText: '100.00',
+                          hintText: 'type a value',
                         ),
-                        onChanged: (val) => context
-                            .read<ExchangeRatesCubit>()
-                            .changeInput(double.parse(val)),
+                        onChanged: (val) {
+                          var value = val;
+                          if (val == '') value = '0';
+                          context
+                              .read<ExchangeRatesCubit>()
+                              .changeInput(double.parse(value));
+                        },
                       ),
                     ),
-                    Container(
-                      width: 30,
-                      height: 30,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image:
-                              NetworkImage('https://flagcdn.com/w320/us.png'),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                    Builder(
+                      builder: (context) {
+                        final flag = lc<CurrencyRepo>()
+                            .getCountryFlagFromCurrency(state.inputCurrency);
+                        return Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              image: NetworkImage(flag),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(width: 12),
                     SizedBox(
