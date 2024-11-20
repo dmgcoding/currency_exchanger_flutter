@@ -18,7 +18,7 @@ This project contains 3 flavors:
 - staging
 - production
 
-To run the desired flavor either use the launch configuration in VSCode/Android Studio or use the following commands:
+To run the desired flavor either use the launch configuration(run as a normal flutter project) in VSCode/Android Studio or use the following commands:
 
 ```sh
 # Development
@@ -32,6 +32,12 @@ $ flutter run --flavor production --target lib/main_production.dart
 ```
 
 _\*Currency Converter works on iOS, Android, Web, and Windows._
+
+---
+
+## Architecture
+
+Architecture used in the project is clean architecture.
 
 ---
 
